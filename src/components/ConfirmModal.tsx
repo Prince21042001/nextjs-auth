@@ -54,27 +54,30 @@ export default function ConfirmModal({
   }, [onCancel, isLoading]);
   
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/50">
+    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/50 backdrop-blur-sm">
       <div 
         ref={modalRef}
-        className="bg-white p-6 rounded-lg shadow-xl max-w-md w-full animate-fade-in"
+        className="bg-white p-6 rounded-xl shadow-lg max-w-md w-full animate-fade-in mx-4"
         role="dialog"
         aria-modal="true"
         aria-labelledby="modal-title"
       >
-        <h2 id="modal-title" className="text-lg font-semibold mb-2">{title}</h2>
-        <p className="text-sm text-gray-700 mb-4 break-words whitespace-normal">{message}</p>
-        <div className="flex justify-end gap-4">
+        <div className="mb-5">
+          <h2 id="modal-title" className="text-xl font-semibold text-gray-800 mb-2">{title}</h2>
+          <p className="text-sm text-gray-600 break-words whitespace-normal">{message}</p>
+        </div>
+        
+        <div className="flex justify-end gap-3">
           <button 
             onClick={onCancel} 
-            className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded transition-colors"
+            className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-all font-medium text-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
             disabled={isLoading}
           >
             Cancel
           </button>
           <button 
             onClick={onConfirm} 
-            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded transition-colors flex items-center justify-center min-w-[80px]"
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all font-medium text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center justify-center min-w-[80px] shadow-sm"
             disabled={isLoading}
           >
             {isLoading ? (

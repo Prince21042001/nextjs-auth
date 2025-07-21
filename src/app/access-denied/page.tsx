@@ -7,11 +7,11 @@ export default function AccessDeniedPage() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] p-6">
-      <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full text-center">
+      <div className="bg-white p-8 rounded-xl shadow-lg max-w-md w-full text-center border border-gray-100">
         <div className="mb-6 flex justify-center">
-          <div className="h-16 w-16 bg-red-100 rounded-full flex items-center justify-center">
+          <div className="h-20 w-20 bg-red-100 rounded-full flex items-center justify-center animate-pulse-slow">
             <svg
-              className="h-8 w-8 text-red-600"
+              className="h-10 w-10 text-red-600"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
@@ -26,28 +26,53 @@ export default function AccessDeniedPage() {
             </svg>
           </div>
         </div>
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Access Denied</h1>
+        <h1 className="text-2xl font-bold text-gray-900 mb-3">Access Denied</h1>
         <p className="text-gray-600 mb-6">
           You don't have permission to access this page. This area requires admin privileges.
         </p>
         {session ? (
-          <div className="text-sm text-gray-500 mb-4">
-            You are signed in as <span className="font-medium">{session.user?.email}</span> with role{" "}
-            <span className="font-medium capitalize">{session.user?.role || "user"}</span>
+          <div className="text-sm bg-gray-50 p-3 rounded-lg mb-6">
+            <p>You are signed in as:</p>
+            <div className="flex items-center justify-center mt-2 space-x-2">
+              {session.user?.image ? (
+                <img 
+                  src={session.user.image} 
+                  alt="Profile" 
+                  className="h-8 w-8 rounded-full border border-gray-200"
+                />
+              ) : (
+                <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
+                  <span className="text-blue-700 font-medium text-sm">
+                    {session.user?.name?.charAt(0) || session.user?.email?.charAt(0) || "U"}
+                  </span>
+                </div>
+              )}
+              <span className="font-medium">{session.user?.email}</span>
+            </div>
+            <div className="mt-2">
+              Role: <span className="font-medium capitalize inline-flex items-center">
+                <span className={`mr-1 h-2 w-2 rounded-full ${
+                  session.user?.role === "admin" ? "bg-purple-500" : "bg-green-500"
+                }`}></span>
+                {session.user?.role || "user"}
+              </span>
+            </div>
           </div>
         ) : (
-          <div className="text-sm text-gray-500 mb-4">You are not currently signed in.</div>
+          <div className="text-sm bg-yellow-50 p-3 rounded-lg mb-6">
+            You are not currently signed in. Please log in to access your dashboard.
+          </div>
         )}
-        <div className="flex justify-center space-x-4">
+        <div className="flex flex-col sm:flex-row justify-center space-y-3 sm:space-y-0 sm:space-x-4">
           <Link
             href="/"
-            className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-md transition-colors"
+            className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-lg transition-all font-medium text-sm shadow-sm"
           >
             Go to Home
           </Link>
           <Link
             href="/dashboard"
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all font-medium text-sm shadow-sm"
           >
             Go to Dashboard
           </Link>

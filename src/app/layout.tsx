@@ -14,26 +14,26 @@ export const metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" className="h-full">
-      <body className={`${inter.className} min-h-screen flex flex-col bg-gradient-to-br from-gray-50 to-gray-100 text-gray-900`}>
+      <body className={`${inter.className} min-h-screen flex flex-col bg-gray-50 text-gray-900`}>
         <SessionProvider>
           <NavBar />
-          <div className="flex-grow container mx-auto px-4 py-8 sm:px-6 lg:px-8">
+          <main className="flex-grow container mx-auto px-4 py-6 sm:px-6 lg:px-8 sm:py-8">
             {children}
-          </div>
-          <footer className="bg-white shadow-inner py-6 border-t">
+          </main>
+          <footer className="bg-white shadow-sm py-6 border-t">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
               <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
                 <p className="text-sm text-gray-600">
                   &copy; {new Date().getFullYear()} MERN Full-Stack App. All rights reserved.
                 </p>
-                <div className="flex space-x-4">
-                  <a href="#" className="text-gray-500 hover:text-gray-700 transition">
+                <div className="flex space-x-6">
+                  <a href="#" className="text-gray-500 hover:text-blue-600 transition text-sm">
                     Privacy
                   </a>
-                  <a href="#" className="text-gray-500 hover:text-gray-700 transition">
+                  <a href="#" className="text-gray-500 hover:text-blue-600 transition text-sm">
                     Terms
                   </a>
-                  <a href="#" className="text-gray-500 hover:text-gray-700 transition">
+                  <a href="#" className="text-gray-500 hover:text-blue-600 transition text-sm">
                     Contact
                   </a>
                 </div>

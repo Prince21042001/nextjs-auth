@@ -75,11 +75,11 @@ function RoleControl({ user, currentUserId }: { user: User; currentUserId: strin
   
   const getConfirmationMessage = () => {
     if (pendingRole === "admin") {
-      return `Are you sure you want to promote ${user.name || user.email} to admin? This will grant them full access to all administrative features.`;
+      return `Are you sure you want to promote ${user.name || user.email} to admin? This gives them full access to all admin features.`;
     } else if (currentRole === "admin" && pendingRole !== "admin") {
-      return `Are you sure you want to demote ${user.name || user.email} from admin to ${pendingRole}? This will revoke their administrative privileges.`;
+      return `Are you sure you want to demote ${user.name || user.email} from admin to ${pendingRole}? This will revoke their admin access.`;
     }
-    return `Are you sure you want to change ${user.name || user.email}'s role from ${currentRole} to ${pendingRole}?`;
+    return `Change role from ${currentRole} to ${pendingRole}?`;
   };
   
   return (
@@ -89,8 +89,8 @@ function RoleControl({ user, currentUserId }: { user: User; currentUserId: strin
           value={currentRole}
           onChange={handleRoleChange}
           disabled={updating || (isSelf && currentRole === "admin")}
-          className={`block w-full rounded-md border-gray-300 py-1.5 text-gray-900 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm ${
-            isSelf && currentRole === "admin" ? "opacity-70" : ""
+          className={`block w-full rounded-lg border-gray-300 py-1.5 text-gray-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm ${
+            isSelf && currentRole === "admin" ? "opacity-70 cursor-not-allowed" : ""
           }`}
         >
           <option value="user">User</option>
@@ -98,7 +98,7 @@ function RoleControl({ user, currentUserId }: { user: User; currentUserId: strin
           <option value="admin">Admin</option>
         </select>
         {updating && !showModal && (
-          <div className="animate-spin h-4 w-4 border-2 border-blue-500 rounded-full border-t-transparent"></div>
+          <div className="animate-spin h-5 w-5 border-2 border-blue-500 rounded-full border-t-transparent"></div>
         )}
       </div>
       
@@ -107,7 +107,7 @@ function RoleControl({ user, currentUserId }: { user: User; currentUserId: strin
       )}
       
       {error && (
-        <div className="text-xs text-red-500 mt-1">{error}</div>
+        <div className="text-xs text-red-500 mt-1 bg-red-50 px-2 py-1 rounded">{error}</div>
       )}
       
       {showModal && (
@@ -215,97 +215,104 @@ export default function AdminUserPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="sm:flex sm:items-center sm:justify-between">
+      <div className="sm:flex sm:items-center sm:justify-between mb-6">
         <h1 className="text-2xl font-semibold text-gray-900">User Management</h1>
-        <p className="mt-2 text-sm text-gray-700 sm:mt-0">
+        <p className="mt-2 text-sm text-gray-700 sm:mt-0 bg-blue-50 py-1 px-3 rounded-full">
           Total users: <span className="font-medium">{users.length}</span>
         </p>
       </div>
       
       {error && (
-        <div className="mt-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative" role="alert">
+        <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg shadow-sm" role="alert">
           <span className="block sm:inline">{error}</span>
         </div>
       )}
       
-      <div className="mt-8 flex flex-col">
-        <div className="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
-          <div className="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
-            <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
-              <table className="min-w-full divide-y divide-gray-300">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
-                      Name
-                    </th>
-                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                      Email
-                    </th>
-                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                      Role
-                    </th>
-                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                      Created At
-                    </th>
-                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200 bg-white">
-                  {users.map((user) => (
-                    <tr key={user._id}>
-                      <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
-                        <div className="flex items-center">
-                          {user.image && (
-                            <img 
-                              src={user.image} 
-                              alt={`${user.name}'s avatar`} 
-                              className="h-8 w-8 rounded-full mr-3"
-                            />
-                          )}
-                          {user.name || "N/A"}
+      <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-medium text-gray-700 sm:pl-6">
+                  Name
+                </th>
+                <th scope="col" className="px-3 py-3.5 text-left text-sm font-medium text-gray-700">
+                  Email
+                </th>
+                <th scope="col" className="px-3 py-3.5 text-left text-sm font-medium text-gray-700">
+                  Role
+                </th>
+                <th scope="col" className="px-3 py-3.5 text-left text-sm font-medium text-gray-700">
+                  Created At
+                </th>
+                <th scope="col" className="px-3 py-3.5 text-left text-sm font-medium text-gray-700">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200 bg-white">
+              {users.map((user) => (
+                <tr key={user._id} className="hover:bg-gray-50">
+                  <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
+                    <div className="flex items-center">
+                      {user.image ? (
+                        <img 
+                          src={user.image} 
+                          alt={`${user.name}'s avatar`} 
+                          className="h-9 w-9 rounded-full mr-3 border border-gray-200"
+                        />
+                      ) : (
+                        <div className="h-9 w-9 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                          <span className="text-blue-700 font-medium text-sm">
+                            {user.name?.charAt(0) || user.email?.charAt(0) || "U"}
+                          </span>
                         </div>
-                      </td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                        {user.email}
-                      </td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                        <span className={`capitalize px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          user.role === "admin" 
-                            ? "bg-purple-100 text-purple-800" 
-                            : user.role === "moderator"
-                              ? "bg-blue-100 text-blue-800"
-                              : "bg-green-100 text-green-800"
-                        }`}>
-                          {user.role || "user"}
-                        </span>
-                      </td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                        {new Date(user.createdAt).toLocaleDateString()}
-                      </td>
-                      <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                        <div className="flex items-center space-x-3">
-                          <RoleControl user={user} currentUserId={session?.user.id || ""} />
-                          {user._id !== session?.user.id && (
-                            <button
-                              onClick={() => handleDeleteUser(user)}
-                              className="text-red-600 hover:text-red-800 transition-colors"
-                              title="Delete user"
-                            >
-                              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                              </svg>
-                            </button>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+                      )}
+                      <div>
+                        <div className="font-medium">{user.name || "N/A"}</div>
+                        {user._id === session?.user.id && (
+                          <div className="text-xs text-gray-500 mt-0.5">You</div>
+                        )}
+                      </div>
+                    </div>
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-600">
+                    {user.email}
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-600">
+                    <span className={`capitalize px-2.5 py-0.5 inline-flex text-xs leading-5 font-medium rounded-full ${
+                      user.role === "admin" 
+                        ? "bg-purple-100 text-purple-800" 
+                        : user.role === "moderator"
+                          ? "bg-blue-100 text-blue-800"
+                          : "bg-green-100 text-green-800"
+                    }`}>
+                      {user.role || "user"}
+                    </span>
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-600">
+                    {new Date(user.createdAt).toLocaleDateString()}
+                  </td>
+                  <td className="whitespace-nowrap py-4 pl-3 pr-4 text-sm font-medium sm:pr-6">
+                    <div className="flex items-center space-x-3">
+                      <RoleControl user={user} currentUserId={session?.user.id || ""} />
+                      {user._id !== session?.user.id && (
+                        <button
+                          onClick={() => handleDeleteUser(user)}
+                          className="text-red-600 hover:text-red-800 transition-colors p-1 rounded-full hover:bg-red-50"
+                          title="Delete user"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
       
