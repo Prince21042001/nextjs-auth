@@ -1,13 +1,21 @@
-import { getServerSession } from "next-auth/next";
+import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import clientPromise from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
+import { authOptions } from "@/lib/auth";
 
 export async function GET(req: Request) {
   // Check if the user is authenticated and has admin role
-  const session = await getServerSession();
+  const session = await getServerSession(authOptions);
   
-  if (!session || session.user.role !== "admin") {
+  if (!session) {
+    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  }
+  
+  console.log("Session in admin/audit API:", JSON.stringify(session, null, 2));
+  
+  if (session.user.role !== "admin") {
+    console.log("Unauthorized access to /api/admin/audit. User role:", session?.user?.role);
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
   }
   

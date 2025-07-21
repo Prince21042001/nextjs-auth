@@ -1,17 +1,25 @@
-import { getServerSession } from "next-auth/next";
+import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import clientPromise from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
 import { logAuditEvent, AuditActions } from "@/lib/audit";
+import { authOptions } from "@/lib/auth";
 
 export async function PATCH(
   req: Request,
   { params }: { params: { id: string } }
 ) {
   // Check if the user is authenticated and has admin role
-  const session = await getServerSession();
+  const session = await getServerSession(authOptions);
   
-  if (!session || session.user.role !== "admin") {
+  if (!session) {
+    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  }
+  
+  console.log("Session in user update API:", JSON.stringify(session, null, 2));
+  
+  if (session.user.role !== "admin") {
+    console.log("Unauthorized access to user update API. User role:", session?.user?.role);
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
   }
   
@@ -91,6 +99,95 @@ export async function PATCH(
     console.error("Error updating user role:", error);
     return NextResponse.json(
       { error: "Failed to update user role" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(
+  req: Request,
+  { params }: { params: { id: string } }
+) {
+  // Check if the user is authenticated and has admin role
+  const session = await getServerSession(authOptions);
+  
+  if (!session) {
+    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  }
+  
+  if (session.user.role !== "admin") {
+    console.log("Unauthorized access to user delete API. User role:", session?.user?.role);
+    return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+  }
+  
+  try {
+    const { id } = params;
+    
+    // Prevent admins from deleting themselves
+    if (id === session.user.id) {
+      return NextResponse.json(
+        { error: "You cannot delete your own account" },
+        { status: 400 }
+      );
+    }
+    
+    const client = await clientPromise;
+    const db = client.db();
+    
+    // Get the target user before deletion
+    const targetUser = await db.collection("users").findOne({ 
+      _id: new ObjectId(id) 
+    });
+    
+    if (!targetUser) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+    
+    // Check if this is the last admin
+    if (targetUser.role === "admin") {
+      const adminCount = await db
+        .collection("users")
+        .countDocuments({ role: "admin" });
+        
+      if (adminCount === 1) {
+        return NextResponse.json(
+          { error: "Cannot delete the last remaining admin" },
+          { status: 400 }
+        );
+      }
+    }
+    
+    // Delete the user
+    const result = await db.collection("users").deleteOne({
+      _id: new ObjectId(id)
+    });
+    
+    if (result.deletedCount === 0) {
+      return NextResponse.json(
+        { error: "User not found or could not be deleted" },
+        { status: 404 }
+      );
+    }
+    
+    // Log the action to audit logs
+    await logAuditEvent({
+      actorId: session.user.id,
+      action: AuditActions.DELETE_USER,
+      targetUserId: id,
+      details: {
+        deletedUser: {
+          email: targetUser.email,
+          name: targetUser.name,
+          role: targetUser.role || "user"
+        }
+      },
+    });
+    
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    return NextResponse.json(
+      { error: "Failed to delete user" },
       { status: 500 }
     );
   }

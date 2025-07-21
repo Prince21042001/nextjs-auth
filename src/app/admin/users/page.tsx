@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
+import ConfirmModal from "@/components/ConfirmModal";
 
 interface User {
   _id: string;
@@ -15,9 +16,27 @@ function RoleControl({ user, currentUserId }: { user: User; currentUserId: strin
   const [updating, setUpdating] = useState(false);
   const [error, setError] = useState("");
   const [currentRole, setCurrentRole] = useState(user.role || "user");
+  const [showModal, setShowModal] = useState(false);
+  const [pendingRole, setPendingRole] = useState<string | null>(null);
   
-  const handleChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+  // Check if this is the current user (self)
+  const isSelf = user._id === currentUserId;
+  
+  const handleRoleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newRole = e.target.value;
+    
+    // If changing from admin to another role, or changing to admin, show confirmation
+    if ((currentRole === "admin" && newRole !== "admin") || 
+        (currentRole !== "admin" && newRole === "admin")) {
+      setPendingRole(newRole);
+      setShowModal(true);
+    } else {
+      // For less critical changes, proceed without confirmation
+      updateRole(newRole);
+    }
+  };
+  
+  const updateRole = async (newRole: string) => {
     setError("");
     setUpdating(true);
     
@@ -38,18 +57,37 @@ function RoleControl({ user, currentUserId }: { user: User; currentUserId: strin
       setError(err.message);
     } finally {
       setUpdating(false);
+      setPendingRole(null);
     }
   };
   
-  // Check if this is the current user (self)
-  const isSelf = user._id === currentUserId;
+  const handleConfirm = () => {
+    if (pendingRole) {
+      updateRole(pendingRole);
+    }
+    setShowModal(false);
+  };
+  
+  const handleCancel = () => {
+    setPendingRole(null);
+    setShowModal(false);
+  };
+  
+  const getConfirmationMessage = () => {
+    if (pendingRole === "admin") {
+      return `Are you sure you want to promote ${user.name || user.email} to admin? This will grant them full access to all administrative features.`;
+    } else if (currentRole === "admin" && pendingRole !== "admin") {
+      return `Are you sure you want to demote ${user.name || user.email} from admin to ${pendingRole}? This will revoke their administrative privileges.`;
+    }
+    return `Are you sure you want to change ${user.name || user.email}'s role from ${currentRole} to ${pendingRole}?`;
+  };
   
   return (
     <div>
       <div className="flex items-center space-x-2">
         <select
           value={currentRole}
-          onChange={handleChange}
+          onChange={handleRoleChange}
           disabled={updating || (isSelf && currentRole === "admin")}
           className={`block w-full rounded-md border-gray-300 py-1.5 text-gray-900 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm ${
             isSelf && currentRole === "admin" ? "opacity-70" : ""
@@ -59,7 +97,7 @@ function RoleControl({ user, currentUserId }: { user: User; currentUserId: strin
           <option value="moderator">Moderator</option>
           <option value="admin">Admin</option>
         </select>
-        {updating && (
+        {updating && !showModal && (
           <div className="animate-spin h-4 w-4 border-2 border-blue-500 rounded-full border-t-transparent"></div>
         )}
       </div>
@@ -71,6 +109,16 @@ function RoleControl({ user, currentUserId }: { user: User; currentUserId: strin
       {error && (
         <div className="text-xs text-red-500 mt-1">{error}</div>
       )}
+      
+      {showModal && (
+        <ConfirmModal
+          title={pendingRole === "admin" ? "Confirm Promotion" : "Confirm Role Change"}
+          message={getConfirmationMessage()}
+          onConfirm={handleConfirm}
+          onCancel={handleCancel}
+          isLoading={updating}
+        />
+      )}
     </div>
   );
 }
@@ -80,6 +128,9 @@ export default function AdminUserPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<User | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -103,6 +154,36 @@ export default function AdminUserPage() {
       fetchUsers();
     }
   }, [status]);
+  
+  const handleDeleteUser = (user: User) => {
+    setUserToDelete(user);
+    setShowDeleteModal(true);
+  };
+  
+  const confirmDelete = async () => {
+    if (!userToDelete) return;
+    
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/admin/users/${userToDelete._id}`, {
+        method: "DELETE",
+      });
+      
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Failed to delete user");
+      }
+      
+      // Remove the user from the list
+      setUsers(users.filter(u => u._id !== userToDelete._id));
+      setShowDeleteModal(false);
+      setUserToDelete(null);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   if (status === "loading" || loading) {
     return (
@@ -166,8 +247,8 @@ export default function AdminUserPage() {
                     <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                       Created At
                     </th>
-                    <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
-                      <span className="sr-only">Actions</span>
+                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                      Actions
                     </th>
                   </tr>
                 </thead>
@@ -204,7 +285,20 @@ export default function AdminUserPage() {
                         {new Date(user.createdAt).toLocaleDateString()}
                       </td>
                       <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                        <RoleControl user={user} currentUserId={session?.user.id || ""} />
+                        <div className="flex items-center space-x-3">
+                          <RoleControl user={user} currentUserId={session?.user.id || ""} />
+                          {user._id !== session?.user.id && (
+                            <button
+                              onClick={() => handleDeleteUser(user)}
+                              className="text-red-600 hover:text-red-800 transition-colors"
+                              title="Delete user"
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                              </svg>
+                            </button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -214,6 +308,19 @@ export default function AdminUserPage() {
           </div>
         </div>
       </div>
+      
+      {showDeleteModal && userToDelete && (
+        <ConfirmModal
+          title="Confirm User Deletion"
+          message={`Are you sure you want to delete ${userToDelete.name || userToDelete.email}? This action cannot be undone.`}
+          onConfirm={confirmDelete}
+          onCancel={() => {
+            setShowDeleteModal(false);
+            setUserToDelete(null);
+          }}
+          isLoading={deleting}
+        />
+      )}
     </div>
   );
 } 
