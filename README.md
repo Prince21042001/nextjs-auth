@@ -1,36 +1,80 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Full-Stack Application
 
-## Getting Started
+This is a full-stack application built with [Next.js](https://nextjs.org), designed to provide a comprehensive solution for managing user roles and sessions.
 
-First, run the development server:
+## Project Overview
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+This project is a full-stack web application that includes features such as user authentication, role management, and session debugging. It is built using Next.js and integrates with a MongoDB database. The application is designed for administrators and users who need to manage access and roles within an organization. Key features include:
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **User Authentication**: Secure login and registration system.
+- **Role Management**: Assign and update user roles.
+- **Session Debugging**: Tools for monitoring and debugging user sessions.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Technologies Used
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Next.js**: A React framework for building server-side rendered applications. It provides a robust structure for building scalable web applications.
+- **MongoDB**: A NoSQL database for storing user and session data. It offers flexibility and scalability for handling large datasets.
+- **Tailwind CSS**: A utility-first CSS framework for styling. It allows for rapid UI development with a consistent design.
+- **TypeScript**: A typed superset of JavaScript that compiles to plain JavaScript. It enhances code quality and maintainability.
 
-## Learn More
+## Installation
 
-To learn more about Next.js, take a look at the following resources:
+To set up the project locally, follow these steps:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. **Clone the repository**:
+   ```bash
+   git clone <repository-url>
+   cd full-stack-app
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+2. **Install dependencies**:
+   ```bash
+   npm install
+   # or
+   yarn install
+   ```
 
-## Deploy on Vercel
+3. **Set up environment variables**:
+   Create a `.env.local` file in the root directory and add the necessary environment variables. For example:
+   ```
+   MONGODB_URI=<your-mongodb-uri>
+   NEXTAUTH_URL=http://localhost:3000
+   ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+4. **Run the development server**:
+   ```bash
+   npm run dev
+   # or
+   yarn dev
+   ```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+   Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+## Usage
+
+- **Development**: The application auto-updates as you edit the files. Use the following commands to start the server:
+  ```bash
+  npm run dev
+  ```
+- **API Routes**: Located in `src/app/api/`, these handle server-side logic. For example, the `auth` route manages user authentication.
+- **Pages**: Located in `src/app/`, these are the main entry points for the application. For example, the `login` page handles user login.
+
+## Directory Structure
+
+- `src/app/`: Contains the main application pages and API routes. Each subdirectory corresponds to a specific feature or page.
+- `src/components/`: Reusable React components that are used across different pages.
+- `src/lib/`: Utility functions and libraries that provide additional functionality.
+- `src/types/`: TypeScript type definitions that ensure type safety across the application.
+- `public/`: Static assets such as images that are publicly accessible.
+
+## Contributing
+
+Contributions are welcome! Please fork the repository and submit a pull request for any features, bug fixes, or improvements. Follow these guidelines:
+
+- **Code Style**: Ensure your code follows the project's coding standards.
+- **Testing**: Write tests for new features and bug fixes.
+- **Pull Requests**: Provide a clear description of your changes and the problem they solve.
+
+## License
+
+This project is licensed under the MIT License. This means you are free to use, modify, and distribute the software, provided that you include the original license and copyright notice in any copies of the software.
