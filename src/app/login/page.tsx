@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 
@@ -9,7 +9,6 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const params = useSearchParams();
   
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -28,7 +27,7 @@ export default function LoginPage() {
       } else {
         router.push("/dashboard"); // Redirect on success
       }
-    } catch (err) {
+    } catch {
       setError("An unexpected error occurred");
     } finally {
       setIsLoading(false);

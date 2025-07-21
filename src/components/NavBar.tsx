@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import { useState, useEffect } from "react";
+import Image from "next/image";
 
 export default function NavBar() {
   const { data: session, status } = useSession();
@@ -22,7 +23,7 @@ export default function NavBar() {
         <nav className="flex items-center justify-between h-16">
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <span className="text-blue-600 font-bold text-xl tracking-tight">MERN App</span>
+              <Image src="/path/to/logo" alt="Logo" width={50} height={50} />
             </div>
             
             {/* Desktop Navigation */}
@@ -81,10 +82,12 @@ export default function NavBar() {
                 <div className="flex items-center space-x-4">
                   <div className="flex items-center space-x-2">
                     {session.user?.image ? (
-                      <img 
+                      <Image 
                         src={session.user.image} 
                         alt="Profile" 
                         className="h-8 w-8 rounded-full border-2 border-blue-200"
+                        width={32}
+                        height={32}
                       />
                     ) : (
                       <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
@@ -151,10 +154,12 @@ export default function NavBar() {
               <div className="pt-2 border-t border-gray-200 mt-2">
                 <div className="flex items-center px-3 py-2">
                   {session.user?.image ? (
-                    <img 
+                    <Image 
                       src={session.user.image} 
                       alt="Profile" 
                       className="h-8 w-8 rounded-full border-2 border-blue-200 mr-2"
+                      width={32}
+                      height={32}
                     />
                   ) : (
                     <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center mr-2">

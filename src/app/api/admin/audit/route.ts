@@ -33,7 +33,7 @@ export async function GET(req: Request) {
     const db = client.db();
     
     // Build query
-    const query: Record<string, any> = {};
+    const query: Record<string, unknown> = {};
     if (action) {
       query.action = action;
     }

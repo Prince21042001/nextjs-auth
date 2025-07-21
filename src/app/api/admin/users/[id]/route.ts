@@ -1,12 +1,12 @@
 import { getServerSession } from "next-auth";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import clientPromise from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
 import { logAuditEvent, AuditActions } from "@/lib/audit";
 import { authOptions } from "@/lib/auth";
 
 export async function PATCH(
-  req: Request,
+  request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   // Check if the user is authenticated and has admin role
@@ -25,7 +25,7 @@ export async function PATCH(
   
   try {
     const { id } = params;
-    const { role } = await req.json();
+    const { role } = await request.json();
     
     // Validate role
     const validRoles = ["user", "admin", "moderator"];
@@ -105,7 +105,7 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  req: Request,
+  request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   // Check if the user is authenticated and has admin role

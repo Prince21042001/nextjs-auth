@@ -5,7 +5,7 @@ import { useSession, signOut } from "next-auth/react";
 
 export default function DebugSessionPage() {
   const { data: session, status } = useSession();
-  const [apiResponse, setApiResponse] = useState<any>(null);
+  const [apiResponse, setApiResponse] = useState<Record<string, unknown> | null>(null);
   const [loading, setLoading] = useState(false);
 
   const fetchSessionFromApi = async () => {
@@ -95,7 +95,7 @@ export default function DebugSessionPage() {
           <h3 className="font-bold mb-2">Common Issues:</h3>
           <ul className="list-disc list-inside space-y-2">
             <li>
-              <strong>Role not showing up:</strong> Make sure your user has the "admin" role in the database (lowercase).
+              <strong>Role not showing up:</strong> Make sure your user has the &quot;admin&quot; role in the database (lowercase).
             </li>
             <li>
               <strong>Session not updating:</strong> Try signing out and signing back in.

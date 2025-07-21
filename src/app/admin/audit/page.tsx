@@ -10,7 +10,7 @@ interface AuditLog {
   actorId: string;
   targetUserId: string;
   action: string;
-  details: Record<string, any>;
+  details: Record<string, unknown>;
   actor?: { name: string; email: string };
   target?: { name: string; email: string };
 }
@@ -42,7 +42,7 @@ export default function AuditLogPage() {
   const currentPage = parseInt(searchParams.get("page") || "1");
   
   useEffect(() => {
-    const fetchAuditLogs = async () => {
+    const fetchAuditLogs = async (): Promise<AuditLog[]> => {
       try {
         setLoading(true);
         
@@ -63,8 +63,12 @@ export default function AuditLogPage() {
         const data = await res.json();
         setLogs(data.logs);
         setPagination(data.pagination);
-      } catch (err: any) {
-        setError(err.message || "Failed to load audit logs");
+        return data.logs;
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          setError(err.message || "Failed to load audit logs");
+        }
+        return [];
       } finally {
         setLoading(false);
       }

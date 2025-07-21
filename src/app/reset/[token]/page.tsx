@@ -43,7 +43,7 @@ export default function ResetPasswordForm() {
         setError(data.error || "Reset failed. Please try again.");
         setStatus("error");
       }
-    } catch (err) {
+    } catch {
       setError("An unexpected error occurred. Please try again.");
       setStatus("error");
     } finally {

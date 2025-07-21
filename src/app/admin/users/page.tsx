@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import ConfirmModal from "@/components/ConfirmModal";
+import Image from "next/image";
 
 interface User {
   _id: string;
@@ -53,8 +54,10 @@ function RoleControl({ user, currentUserId }: { user: User; currentUserId: strin
       }
       
       setCurrentRole(newRole);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      }
     } finally {
       setUpdating(false);
       setPendingRole(null);
@@ -133,7 +136,7 @@ export default function AdminUserPage() {
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
-    const fetchUsers = async () => {
+    const fetchUsers = async (): Promise<User[]> => {
       try {
         const res = await fetch("/api/admin/users");
         
@@ -142,16 +145,19 @@ export default function AdminUserPage() {
         }
         
         const data = await res.json();
-        setUsers(data.users);
-      } catch (err: any) {
-        setError(err.message || "Failed to load users");
+        return data.users;
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          setError(err.message || "Failed to load users");
+        }
+        return [];
       } finally {
         setLoading(false);
       }
     };
 
     if (status === "authenticated") {
-      fetchUsers();
+      fetchUsers().then(setUsers);
     }
   }, [status]);
   
@@ -178,8 +184,10 @@ export default function AdminUserPage() {
       setUsers(users.filter(u => u._id !== userToDelete._id));
       setShowDeleteModal(false);
       setUserToDelete(null);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      }
     } finally {
       setDeleting(false);
     }
@@ -256,10 +264,12 @@ export default function AdminUserPage() {
                   <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
                     <div className="flex items-center">
                       {user.image ? (
-                        <img 
+                        <Image 
                           src={user.image} 
                           alt={`${user.name}'s avatar`} 
                           className="h-9 w-9 rounded-full mr-3 border border-gray-200"
+                          width={36}
+                          height={36}
                         />
                       ) : (
                         <div className="h-9 w-9 rounded-full bg-blue-100 flex items-center justify-center mr-3">

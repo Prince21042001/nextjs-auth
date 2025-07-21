@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import clientPromise from "@/lib/mongodb";
 import { authOptions } from "@/lib/auth";
 
-export async function GET(req: Request) {
+export async function GET() {
   // Check if the user is authenticated and has admin role
   const session = await getServerSession(authOptions);
   

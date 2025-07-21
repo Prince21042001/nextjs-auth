@@ -39,7 +39,7 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async signIn({ user, account, profile }) {
+    async signIn({ user, account }) {
       const client = await clientPromise;
       const db = client.db();
       const users = db.collection("users");

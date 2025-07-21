@@ -1,6 +1,7 @@
 "use client";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function AccessDeniedPage() {
   const { data: session } = useSession();
@@ -28,17 +29,19 @@ export default function AccessDeniedPage() {
         </div>
         <h1 className="text-2xl font-bold text-gray-900 mb-3">Access Denied</h1>
         <p className="text-gray-600 mb-6">
-          You don't have permission to access this page. This area requires admin privileges.
+          You don&apos;t have permission to access this page. This area requires admin privileges.
         </p>
         {session ? (
           <div className="text-sm bg-gray-50 p-3 rounded-lg mb-6">
             <p>You are signed in as:</p>
             <div className="flex items-center justify-center mt-2 space-x-2">
               {session.user?.image ? (
-                <img 
+                <Image 
                   src={session.user.image} 
                   alt="Profile" 
                   className="h-8 w-8 rounded-full border border-gray-200"
+                  width={32}
+                  height={32}
                 />
               ) : (
                 <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">

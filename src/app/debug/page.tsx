@@ -17,8 +17,10 @@ export default function DebugPage() {
       if (!res.ok) throw new Error("Failed to fetch user data");
       const data = await res.json();
       setDbUser(data.user);
-    } catch (err: any) {
-      setError(err.message || "An error occurred");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message || "An error occurred");
+      }
     } finally {
       setLoading(false);
     }
@@ -70,9 +72,9 @@ export default function DebugPage() {
       <div className="mb-8">
         <h2 className="text-xl font-semibold mb-2">Help</h2>
         <div className="bg-yellow-50 p-4 rounded-md">
-          <p className="mb-2">If your role is not showing up correctly:</p>
+          <p className="mb-2">&quot;Debug&quot; information</p>
           <ol className="list-decimal list-inside">
-            <li>Check that the role in the database is lowercase "admin"</li>
+            <li>Check that the role in the database is lowercase &quot;admin&quot;</li>
             <li>Try logging out and logging back in</li>
             <li>Clear your browser cookies and try again</li>
           </ol>
