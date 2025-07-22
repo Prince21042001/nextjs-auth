@@ -35,6 +35,15 @@ function LoginContent() {
         setError(`Authentication error: ${errorType}`);
       }
     }
+    
+    // Check if we're being redirected back with a callbackUrl
+    const callbackUrl = searchParams?.get("callbackUrl");
+    if (callbackUrl && callbackUrl.includes("/dashboard")) {
+      // This means we were redirected back to login with a dashboard callbackUrl
+      // This is a sign of an authentication issue
+      console.log("Detected redirect loop with callbackUrl:", callbackUrl);
+      setError("Authentication failed. Please try again or use a different sign-in method.");
+    }
   }, [searchParams]);
   
   async function handleSubmit(e: React.FormEvent) {
@@ -69,9 +78,10 @@ function LoginContent() {
       // Log the attempt for debugging
       console.log("Initiating Google sign-in");
       
-      // The callbackUrl is important - it tells NextAuth where to redirect after successful authentication
+      // Force redirect to true and specify the absolute URL for the callback
+      const baseUrl = window.location.origin;
       await signIn("google", { 
-        callbackUrl: "/dashboard",
+        callbackUrl: `${baseUrl}/dashboard`,
         redirect: true
       });
     } catch (err) {

@@ -58,6 +58,13 @@ export const authOptions: NextAuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      authorization: {
+        params: {
+          prompt: "consent",
+          access_type: "offline",
+          response_type: "code"
+        }
+      }
     }),
   ],
   callbacks: {
@@ -106,6 +113,7 @@ export const authOptions: NextAuthOptions = {
             
             // Use the existing user's ID for the session
             user.id = existingUser._id.toString();
+            user.role = existingUser.role || "user";
             return true;
           } else {
             console.log("Creating new user from OAuth");
@@ -127,6 +135,7 @@ export const authOptions: NextAuthOptions = {
             
             // Set the user ID to the newly created record
             user.id = result.insertedId.toString();
+            user.role = "user";
           }
         }
         
@@ -137,34 +146,36 @@ export const authOptions: NextAuthOptions = {
       }
     },
     
-    async jwt({ token, user, account }) {
+    async jwt({ token, user, account, trigger }) {
       try {
         // Initial sign in
-        if (user) {
-          console.log("JWT callback - setting user data in token");
-          token.id = user.id;
-          token.role = user.role || "user";
-          
-          // If this is an OAuth sign-in, we might need to update the token
-          if (account && account.provider !== "credentials") {
-            try {
-              const db = await getMongoDb();
-              
-              // Get the most up-to-date user data
-              const dbUser = await db.collection("users").findOne({ 
-                _id: new ObjectId(user.id) 
-              });
-              
-              if (dbUser) {
-                // Update token with latest user data
-                token.name = dbUser.name;
-                token.email = dbUser.email;
-                token.picture = dbUser.image;
-                token.role = dbUser.role || "user";
+        if (trigger === "signIn" || trigger === "signUp") {
+          if (user) {
+            console.log("JWT callback - setting user data in token");
+            token.id = user.id;
+            token.role = user.role || "user";
+            
+            // If this is an OAuth sign-in, we might need to update the token
+            if (account && account.provider !== "credentials") {
+              try {
+                const db = await getMongoDb();
+                
+                // Get the most up-to-date user data
+                const dbUser = await db.collection("users").findOne({ 
+                  _id: new ObjectId(user.id) 
+                });
+                
+                if (dbUser) {
+                  // Update token with latest user data
+                  token.name = dbUser.name;
+                  token.email = dbUser.email;
+                  token.picture = dbUser.image;
+                  token.role = dbUser.role || "user";
+                }
+              } catch (error) {
+                console.error("Error in jwt callback:", error);
+                // Continue with existing token data
               }
-            } catch (error) {
-              console.error("Error in jwt callback:", error);
-              // Continue with existing token data
             }
           }
         }
@@ -178,15 +189,15 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       try {
         if (session.user && token) {
-          session.user.id = token.id;
-          session.user.role = token.role;
+          session.user.id = token.id as string;
+          session.user.role = token.role as string;
           
           // Optionally, update session with the latest user data from the database
           try {
             const db = await getMongoDb();
             
             const user = await db.collection("users").findOne({ 
-              _id: new ObjectId(token.id) 
+              _id: new ObjectId(token.id as string) 
             });
             
             if (user) {
@@ -205,6 +216,19 @@ export const authOptions: NextAuthOptions = {
         console.error("Error in session callback:", error);
         return session;
       }
+    },
+    async redirect({ url, baseUrl }) {
+      // Allows relative callback URLs
+      if (url.startsWith("/")) return `${baseUrl}${url}`;
+      // Allows callback URLs on the same origin
+      else if (new URL(url).origin === baseUrl) return url;
+      
+      // Always redirect to dashboard after sign in
+      if (url.includes('/api/auth/callback/')) {
+        return `${baseUrl}/dashboard`;
+      }
+      
+      return baseUrl;
     }
   },
   pages: {
@@ -215,6 +239,17 @@ export const authOptions: NextAuthOptions = {
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60, // 30 days
     updateAge: 24 * 60 * 60, // Refresh session every 24 hours
+  },
+  cookies: {
+    sessionToken: {
+      name: `next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: process.env.NODE_ENV === "production"
+      }
+    }
   },
   debug: process.env.NODE_ENV === "development",
   secret: process.env.NEXTAUTH_SECRET,
