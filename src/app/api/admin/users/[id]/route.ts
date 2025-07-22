@@ -1,14 +1,16 @@
 import { getServerSession } from "next-auth";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import clientPromise from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
 import { logAuditEvent, AuditActions } from "@/lib/audit";
 import { authOptions } from "@/lib/auth";
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PATCH(req: Request) {
+  // Extract the id from the URL
+  const url = new URL(req.url);
+  const pathParts = url.pathname.split('/');
+  const id = pathParts[pathParts.length - 1];
+
   // Check if the user is authenticated and has admin role
   const session = await getServerSession(authOptions);
   
@@ -24,8 +26,7 @@ export async function PATCH(
   }
   
   try {
-    const { id } = params;
-    const { role } = await request.json();
+    const { role } = await req.json();
     
     // Validate role
     const validRoles = ["user", "admin", "moderator"];
@@ -104,10 +105,12 @@ export async function PATCH(
   }
 }
 
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(req: Request) {
+  // Extract the id from the URL
+  const url = new URL(req.url);
+  const pathParts = url.pathname.split('/');
+  const id = pathParts[pathParts.length - 1];
+
   // Check if the user is authenticated and has admin role
   const session = await getServerSession(authOptions);
   
@@ -121,8 +124,6 @@ export async function DELETE(
   }
   
   try {
-    const { id } = params;
-    
     // Prevent admins from deleting themselves
     if (id === session.user.id) {
       return NextResponse.json(

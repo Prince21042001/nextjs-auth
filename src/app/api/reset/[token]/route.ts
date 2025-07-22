@@ -3,8 +3,12 @@ import { hash } from "bcryptjs";
 import clientPromise from "@/lib/mongodb";
 import { NextResponse } from "next/server";
 
-export async function POST(req: Request, { params }: { params: { token: string } }) {
-  const { token } = params;
+export async function POST(req: Request) {
+  // Extract the token from the URL
+  const url = new URL(req.url);
+  const pathParts = url.pathname.split('/');
+  const token = pathParts[pathParts.length - 1];
+  
   const { password } = await req.json();
   
   const client = await clientPromise;

@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSession } from "next-auth/react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
@@ -22,7 +22,17 @@ interface Pagination {
   totalCount: number;
 }
 
-export default function AuditLogPage() {
+// Loading component
+function AuditLoading() {
+  return (
+    <div className="flex justify-center items-center min-h-[60vh]">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+    </div>
+  );
+}
+
+// Component that uses searchParams
+function AuditContent() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -418,5 +428,14 @@ export default function AuditLogPage() {
         </div>
       )}
     </div>
+  );
+}
+
+// Main component with Suspense boundary
+export default function AuditLogPage() {
+  return (
+    <Suspense fallback={<AuditLoading />}>
+      <AuditContent />
+    </Suspense>
   );
 } 
