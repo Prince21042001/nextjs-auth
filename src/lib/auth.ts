@@ -5,6 +5,17 @@ import { compare } from "bcryptjs";
 import clientPromise from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
 
+// Helper function to safely access the database with error handling
+async function getMongoDb() {
+  try {
+    const client = await clientPromise;
+    return client.db();
+  } catch (error) {
+    console.error("Failed to connect to MongoDB in auth.ts:", error);
+    throw new Error("Database connection failed. Please check your MongoDB Atlas settings.");
+  }
+}
+
 // Export the NextAuth options to be reused across the app
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -15,22 +26,32 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        const client = await clientPromise;
-        const db = client.db();
-        const user = await db
-          .collection("users")
-          .findOne({ email: credentials!.email });
-        if (!user) throw new Error("User not found");
-        const isValid = await compare(credentials!.password, user.password);
-        if (!isValid) throw new Error("Invalid password");
-        
-        // Include the role in the returned user object
-        return { 
-          id: user._id.toString(), 
-          email: user.email, 
-          name: user.name,
-          role: user.role || "user" // Make sure to include the role
-        };
+        try {
+          if (!credentials?.email || !credentials?.password) {
+            throw new Error("Email and password are required");
+          }
+
+          const db = await getMongoDb();
+          const user = await db
+            .collection("users")
+            .findOne({ email: credentials.email });
+
+          if (!user) throw new Error("User not found");
+
+          const isValid = await compare(credentials.password, user.password);
+          if (!isValid) throw new Error("Invalid password");
+          
+          // Include the role in the returned user object
+          return { 
+            id: user._id.toString(), 
+            email: user.email, 
+            name: user.name,
+            role: user.role || "user" // Make sure to include the role
+          };
+        } catch (error: any) {
+          console.error("Authentication error:", error.message);
+          throw error;
+        }
       },
     }),
     GoogleProvider({
@@ -40,125 +61,160 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async signIn({ user, account }) {
-      const client = await clientPromise;
-      const db = client.db();
-      const users = db.collection("users");
-      
-      // For OAuth accounts (like Google)
-      if (account && account.provider !== "credentials") {
-        // Check if a user with this email already exists
-        const existingUser = await users.findOne({ email: user.email });
+      try {
+        console.log("SignIn callback - user:", user.email);
+        console.log("SignIn callback - provider:", account?.provider);
         
-        if (existingUser) {
-          // If user exists but doesn't have OAuth provider linked
-          if (!existingUser.oauthProviders || !existingUser.oauthProviders.includes(account.provider)) {
-            // Link this OAuth provider to the existing account
-            await users.updateOne(
-              { _id: existingUser._id },
-              { 
-                $set: { 
-                  // Update profile data with latest from OAuth
-                  name: user.name || existingUser.name,
-                  image: user.image || existingUser.image,
-                  updatedAt: new Date(),
-                },
-                $addToSet: { 
-                  oauthProviders: account.provider,
-                  // Store OAuth account details for reference
-                  linkedAccounts: {
-                    provider: account.provider,
-                    providerAccountId: account.providerAccountId,
-                    linkedAt: new Date()
+        const db = await getMongoDb();
+        const users = db.collection("users");
+        
+        // For OAuth accounts (like Google)
+        if (account && account.provider !== "credentials") {
+          // Check if a user with this email already exists
+          const existingUser = await users.findOne({ email: user.email });
+          
+          if (existingUser) {
+            console.log("Found existing user:", existingUser._id.toString());
+            
+            // If user exists but doesn't have OAuth provider linked
+            if (!existingUser.oauthProviders || !existingUser.oauthProviders.includes(account.provider)) {
+              console.log("Linking OAuth provider to existing account");
+              
+              // Link this OAuth provider to the existing account
+              await users.updateOne(
+                { _id: existingUser._id },
+                { 
+                  $set: { 
+                    // Update profile data with latest from OAuth
+                    name: user.name || existingUser.name,
+                    image: user.image || existingUser.image,
+                    updatedAt: new Date(),
+                  },
+                  $addToSet: { 
+                    oauthProviders: account.provider,
+                    // Store OAuth account details for reference
+                    linkedAccounts: {
+                      provider: account.provider,
+                      providerAccountId: account.providerAccountId,
+                      linkedAt: new Date()
+                    }
                   }
                 }
-              }
-            );
+              );
+            }
+            
+            // Use the existing user's ID for the session
+            user.id = existingUser._id.toString();
+            return true;
+          } else {
+            console.log("Creating new user from OAuth");
+            
+            // Create a new user record for this OAuth login
+            const result = await users.insertOne({
+              name: user.name,
+              email: user.email,
+              image: user.image,
+              role: "user", // Default role
+              createdAt: new Date(),
+              oauthProviders: [account.provider],
+              linkedAccounts: [{
+                provider: account.provider,
+                providerAccountId: account.providerAccountId,
+                linkedAt: new Date()
+              }]
+            });
+            
+            // Set the user ID to the newly created record
+            user.id = result.insertedId.toString();
           }
-          
-          // Use the existing user's ID for the session
-          user.id = existingUser._id.toString();
-          return true;
-        } else {
-          // Create a new user record for this OAuth login
-          const result = await users.insertOne({
-            name: user.name,
-            email: user.email,
-            image: user.image,
-            createdAt: new Date(),
-            oauthProviders: [account.provider],
-            linkedAccounts: [{
-              provider: account.provider,
-              providerAccountId: account.providerAccountId,
-              linkedAt: new Date()
-            }]
-          });
-          
-          // Set the user ID to the newly created record
-          user.id = result.insertedId.toString();
         }
+        
+        return true;
+      } catch (error) {
+        console.error("Error in signIn callback:", error);
+        return false; // Reject sign in on database error
       }
-      
-      return true;
     },
     
     async jwt({ token, user, account }) {
-      // Initial sign in
-      if (user) {
-        token.id = user.id;
-        token.role = user.role || "user";
-        
-        // If this is an OAuth sign-in, we might need to update the token
-        if (account && account.provider !== "credentials") {
-          const client = await clientPromise;
-          const db = client.db();
+      try {
+        // Initial sign in
+        if (user) {
+          console.log("JWT callback - setting user data in token");
+          token.id = user.id;
+          token.role = user.role || "user";
           
-          // Get the most up-to-date user data
-          const dbUser = await db.collection("users").findOne({ 
-            _id: new ObjectId(user.id) 
-          });
-          
-          if (dbUser) {
-            // Update token with latest user data
-            token.name = dbUser.name;
-            token.email = dbUser.email;
-            token.picture = dbUser.image;
-            token.role = dbUser.role || "user";
+          // If this is an OAuth sign-in, we might need to update the token
+          if (account && account.provider !== "credentials") {
+            try {
+              const db = await getMongoDb();
+              
+              // Get the most up-to-date user data
+              const dbUser = await db.collection("users").findOne({ 
+                _id: new ObjectId(user.id) 
+              });
+              
+              if (dbUser) {
+                // Update token with latest user data
+                token.name = dbUser.name;
+                token.email = dbUser.email;
+                token.picture = dbUser.image;
+                token.role = dbUser.role || "user";
+              }
+            } catch (error) {
+              console.error("Error in jwt callback:", error);
+              // Continue with existing token data
+            }
           }
         }
+        return token;
+      } catch (error) {
+        console.error("Error in jwt callback:", error);
+        return token;
       }
-      return token;
     },
     
     async session({ session, token }) {
-      if (session.user && token) {
-        session.user.id = token.id;
-        session.user.role = token.role;
-        
-        // Optionally, update session with the latest user data from the database
-        const client = await clientPromise;
-        const db = client.db();
-        
-        const user = await db.collection("users").findOne({ 
-          _id: new ObjectId(token.id) 
-        });
-        
-        if (user) {
-          session.user.name = user.name;
-          session.user.email = user.email;
-          session.user.image = user.image;
-          session.user.role = user.role || "user";
+      try {
+        if (session.user && token) {
+          session.user.id = token.id;
+          session.user.role = token.role;
+          
+          // Optionally, update session with the latest user data from the database
+          try {
+            const db = await getMongoDb();
+            
+            const user = await db.collection("users").findOne({ 
+              _id: new ObjectId(token.id) 
+            });
+            
+            if (user) {
+              session.user.name = user.name;
+              session.user.email = user.email;
+              session.user.image = user.image;
+              session.user.role = user.role || "user";
+            }
+          } catch (error) {
+            console.error("Error in session callback:", error);
+            // Continue with existing session data
+          }
         }
+        return session;
+      } catch (error) {
+        console.error("Error in session callback:", error);
+        return session;
       }
-      return session;
     }
   },
   pages: {
     signIn: "/login",
+    error: "/login?error=database", // Redirect to login page with error on database issues
   },
   session: {
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60, // 30 days
     updateAge: 24 * 60 * 60, // Refresh session every 24 hours
   },
+  debug: process.env.NODE_ENV === "development",
   secret: process.env.NEXTAUTH_SECRET,
 }; 
