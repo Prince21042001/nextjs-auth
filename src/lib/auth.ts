@@ -48,8 +48,9 @@ export const authOptions: NextAuthOptions = {
             name: user.name,
             role: user.role || "user" // Make sure to include the role
           };
-        } catch (error: any) {
-          console.error("Authentication error:", error.message);
+        } catch (error: unknown) {
+          const errorMessage = error instanceof Error ? error.message : 'Unknown authentication error';
+          console.error("Authentication error:", errorMessage);
           throw error;
         }
       },

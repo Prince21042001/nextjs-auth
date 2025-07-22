@@ -1,10 +1,20 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 
-export default function LoginPage() {
+// Loading component
+function LoginLoading() {
+  return (
+    <div className="flex justify-center items-center min-h-[60vh]">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+    </div>
+  );
+}
+
+// Component that uses searchParams
+function LoginContent() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -200,5 +210,14 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+// Main component with Suspense boundary
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<LoginLoading />}>
+      <LoginContent />
+    </Suspense>
   );
 }
