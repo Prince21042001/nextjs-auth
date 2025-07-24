@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { fetchLatestQuotes, formatPrice, formatPercentChange, formatLargeNumber, getPriceChangeColorClass, CryptoData } from '@/lib/coingecko';
-// @ts-expect-error: CryptoChart type declarations are missing
 import CryptoChart from './CryptoChart';
 import CryptoIcon from './CryptoIcon';
 
