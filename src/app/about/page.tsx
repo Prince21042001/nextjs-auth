@@ -1,174 +1,184 @@
+'use client';
+
+import Link from 'next/link';
+import Image from 'next/image';
+
 export default function AboutPage() {
   return (
-    <div className="bg-white">
-      {/* Hero section */}
-      <div className="relative bg-gray-50 overflow-hidden">
-        <div className="relative pt-6 pb-16 sm:pb-24">
-          <div className="mt-16 mx-auto max-w-7xl px-4 sm:mt-24 sm:px-6">
-            <div className="text-center">
-              <h1 className="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
-                <span className="block">About This</span>
-                <span className="block text-blue-600">Project</span>
-              </h1>
-              <p className="mt-3 max-w-md mx-auto text-base text-gray-500 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
-                A comprehensive full-stack application demonstrating modern web development practices with the MERN stack.
+    <div className="text-white">
+      {/* Hero Section */}
+      <section className="py-16 md:py-20 px-4 bg-gradient-to-br from-[#1a1a1a] to-[#121212]">
+        <div className="container mx-auto max-w-7xl">
+          <div className="text-center max-w-3xl mx-auto">
+            <h1 className="text-4xl md:text-5xl font-bold mb-6">About Our AI Crypto Research Platform</h1>
+            <p className="text-gray-400 text-lg mb-8">
+              We combine advanced machine learning with comprehensive market data to help crypto investors make more informed decisions.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Our Mission */}
+      <section className="py-16 px-4">
+        <div className="container mx-auto max-w-7xl">
+          <div className="flex flex-col md:flex-row items-center gap-12">
+            <div className="md:w-1/2">
+              <div className="bg-[#1e1e1e] rounded-lg border border-[#333] p-4 shadow-xl">
+                <div className="bg-[#252525] rounded-md h-[400px] w-full relative overflow-hidden">
+                  <Image 
+                    src="/images/crypto-assets-new-technologies-can-help-combat-amlcft.webp"
+                    alt="Cryptocurrency Technologies"
+                    fill
+                    style={{ objectFit: 'cover' }}
+                    className="rounded-md"
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="md:w-1/2">
+              <h2 className="text-3xl font-bold mb-6">Our Mission</h2>
+              <p className="text-gray-400 mb-4">
+                Our mission is to democratize access to advanced cryptocurrency analysis tools that were previously available only to institutional investors and whale traders. We believe that by leveraging the power of artificial intelligence and machine learning, we can level the playing field for retail crypto investors.
+              </p>
+              <p className="text-gray-400 mb-6">
+                We're committed to providing accurate, transparent, and actionable insights that help you navigate the volatile crypto markets and make better investment decisions, regardless of your experience level or portfolio size.
+              </p>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-[#252525] p-4 rounded-lg">
+                  <div className="text-green-500 font-bold text-2xl mb-1">92%</div>
+                  <div className="text-sm text-gray-400">Accuracy in trend predictions</div>
+                </div>
+                <div className="bg-[#252525] p-4 rounded-lg">
+                  <div className="text-green-500 font-bold text-2xl mb-1">65K+</div>
+                  <div className="text-sm text-gray-400">Active users worldwide</div>
+                </div>
+                <div className="bg-[#252525] p-4 rounded-lg">
+                  <div className="text-green-500 font-bold text-2xl mb-1">8M+</div>
+                  <div className="text-sm text-gray-400">Predictions generated</div>
+                </div>
+                <div className="bg-[#252525] p-4 rounded-lg">
+                  <div className="text-green-500 font-bold text-2xl mb-1">24/7</div>
+                  <div className="text-sm text-gray-400">Real-time market analysis</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Our Technology */}
+      <section className="py-16 px-4 bg-[#1a1a1a]">
+        <div className="container mx-auto max-w-7xl">
+          <div className="text-center max-w-3xl mx-auto mb-12">
+            <h2 className="text-3xl font-bold mb-4">Our Technology</h2>
+            <p className="text-gray-400">
+              Our platform leverages cutting-edge AI and machine learning technologies to analyze cryptocurrency market data and generate accurate predictions.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="bg-[#1e1e1e] p-6 rounded-lg border border-[#333] hover:border-blue-500 transition-all">
+              <div className="bg-blue-600 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold mb-3">Neural Networks</h3>
+              <p className="text-gray-400">
+                Our custom neural network architecture is specifically designed for time series forecasting and pattern recognition in highly volatile cryptocurrency markets.
+              </p>
+            </div>
+
+            <div className="bg-[#1e1e1e] p-6 rounded-lg border border-[#333] hover:border-blue-500 transition-all">
+              <div className="bg-green-600 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold mb-3">Advanced Analytics</h3>
+              <p className="text-gray-400">
+                We process millions of data points daily, including price movements, trading volumes, on-chain metrics, exchange flows, news sentiment, and social media trends.
+              </p>
+            </div>
+
+            <div className="bg-[#1e1e1e] p-6 rounded-lg border border-[#333] hover:border-blue-500 transition-all">
+              <div className="bg-purple-600 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold mb-3">Predictive Models</h3>
+              <p className="text-gray-400">
+                Our models are continuously trained and validated on historical crypto market data to ensure the highest possible accuracy in various market conditions, from bull runs to bear markets.
               </p>
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Technology stack section */}
-      <div className="py-12 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="lg:text-center">
-            <h2 className="text-base text-blue-600 font-semibold tracking-wide uppercase">Technology Stack</h2>
-            <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
-              Built with cutting-edge technologies
-            </p>
-            <p className="mt-4 max-w-2xl text-xl text-gray-500 lg:mx-auto">
-              Our application leverages the power of the MERN stack to deliver a seamless user experience.
+      {/* How It Works */}
+      <section className="py-16 px-4">
+        <div className="container mx-auto max-w-7xl">
+          <div className="text-center max-w-3xl mx-auto mb-12">
+            <h2 className="text-3xl font-bold mb-4">How It Works</h2>
+            <p className="text-gray-400">
+              Our platform makes it easy to get started with AI-powered cryptocurrency analysis and predictions.
             </p>
           </div>
 
-          <div className="mt-10">
-            <div className="space-y-10 md:space-y-0 md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-10">
-              {/* MongoDB */}
-              <div className="relative">
-                <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-green-500 text-white">
-                  <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4" />
-                  </svg>
-                </div>
-                <div className="ml-16">
-                  <h3 className="text-lg leading-6 font-medium text-gray-900">MongoDB</h3>
-                  <p className="mt-2 text-base text-gray-500">
-                    A flexible NoSQL database that provides high performance, high availability, and easy scalability.
-                  </p>
-                </div>
-              </div>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="bg-[#1e1e1e] p-6 rounded-lg border border-[#333] relative">
+              <div className="absolute -top-3 -left-3 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">1</div>
+              <h3 className="text-lg font-bold mb-3 mt-2">Search</h3>
+              <p className="text-gray-400 text-sm">
+                Enter a cryptocurrency symbol or name to access our comprehensive database of market information and historical data.
+              </p>
+            </div>
 
-              {/* Express.js */}
-              <div className="relative">
-                <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-gray-600 text-white">
-                  <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2" />
-                  </svg>
-                </div>
-                <div className="ml-16">
-                  <h3 className="text-lg leading-6 font-medium text-gray-900">Express.js</h3>
-                  <p className="mt-2 text-base text-gray-500">
-                    A minimal and flexible Node.js web application framework that provides robust features for web and mobile applications.
-                  </p>
-                </div>
-              </div>
+            <div className="bg-[#1e1e1e] p-6 rounded-lg border border-[#333] relative">
+              <div className="absolute -top-3 -left-3 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">2</div>
+              <h3 className="text-lg font-bold mb-3 mt-2">Analyze</h3>
+              <p className="text-gray-400 text-sm">
+                Our AI analyzes historical data, market trends, on-chain metrics, and various technical indicators to identify patterns.
+              </p>
+            </div>
 
-              {/* React */}
-              <div className="relative">
-                <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-blue-400 text-white">
-                  <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5" />
-                  </svg>
-                </div>
-                <div className="ml-16">
-                  <h3 className="text-lg leading-6 font-medium text-gray-900">React</h3>
-                  <p className="mt-2 text-base text-gray-500">
-                    A JavaScript library for building user interfaces, allowing us to create reusable UI components.
-                  </p>
-                </div>
-              </div>
+            <div className="bg-[#1e1e1e] p-6 rounded-lg border border-[#333] relative">
+              <div className="absolute -top-3 -left-3 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">3</div>
+              <h3 className="text-lg font-bold mb-3 mt-2">Predict</h3>
+              <p className="text-gray-400 text-sm">
+                Our neural network generates price predictions and trend forecasts based on the analyzed data, accounting for crypto market volatility.
+              </p>
+            </div>
 
-              {/* Node.js */}
-              <div className="relative">
-                <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-green-600 text-white">
-                  <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
-                </div>
-                <div className="ml-16">
-                  <h3 className="text-lg leading-6 font-medium text-gray-900">Node.js</h3>
-                  <p className="mt-2 text-base text-gray-500">
-                    A JavaScript runtime built on Chrome&apos;s V8 JavaScript engine for building fast and scalable network applications.
-                  </p>
-                </div>
-              </div>
+            <div className="bg-[#1e1e1e] p-6 rounded-lg border border-[#333] relative">
+              <div className="absolute -top-3 -left-3 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">4</div>
+              <h3 className="text-lg font-bold mb-3 mt-2">Decide</h3>
+              <p className="text-gray-400 text-sm">
+                Use our actionable insights and visualizations to make more informed cryptocurrency investment decisions.
+              </p>
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Key features section */}
-      <div className="bg-gray-50 py-16 lg:py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="lg:text-center">
-            <h2 className="text-base text-blue-600 font-semibold tracking-wide uppercase">Key Features</h2>
-            <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
-              Designed for modern web development
-            </p>
-          </div>
-
-          <div className="mt-10">
-            <dl className="space-y-10 md:space-y-0 md:grid md:grid-cols-3 md:gap-x-8 md:gap-y-10">
-              <div className="bg-white p-6 rounded-lg shadow-md">
-                <dt>
-                  <div className="flex items-center justify-center h-12 w-12 rounded-md bg-blue-500 text-white mb-4">
-                    <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                    </svg>
-                  </div>
-                  <p className="text-lg leading-6 font-medium text-gray-900">Authentication & Authorization</p>
-                </dt>
-                <dd className="mt-2 text-base text-gray-500">
-                  Secure user authentication with role-based access control to protect your data.
-                </dd>
-              </div>
-
-              <div className="bg-white p-6 rounded-lg shadow-md">
-                <dt>
-                  <div className="flex items-center justify-center h-12 w-12 rounded-md bg-blue-500 text-white mb-4">
-                    <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
-                    </svg>
-                  </div>
-                  <p className="text-lg leading-6 font-medium text-gray-900">Responsive Design</p>
-                </dt>
-                <dd className="mt-2 text-base text-gray-500">
-                  Modern, responsive UI that works seamlessly across desktop, tablet, and mobile devices.
-                </dd>
-              </div>
-
-              <div className="bg-white p-6 rounded-lg shadow-md">
-                <dt>
-                  <div className="flex items-center justify-center h-12 w-12 rounded-md bg-blue-500 text-white mb-4">
-                    <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                    </svg>
-                  </div>
-                  <p className="text-lg leading-6 font-medium text-gray-900">Security</p>
-                </dt>
-                <dd className="mt-2 text-base text-gray-500">
-                  Built with security best practices to protect against common web vulnerabilities.
-                </dd>
-              </div>
-            </dl>
+      {/* CTA Section */}
+      <section className="py-16 px-4 bg-gradient-to-r from-blue-900 to-indigo-900">
+        <div className="container mx-auto max-w-7xl text-center">
+          <h2 className="text-3xl font-bold mb-6">Ready to Try Our AI Crypto Predictor?</h2>
+          <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
+            Start making data-driven cryptocurrency investment decisions with our advanced AI tools.
+          </p>
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <Link href="/crypto-predictor" className="bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-8 rounded-lg transition duration-300">
+              Try It Now
+            </Link>
+            <Link href="/register" className="bg-transparent hover:bg-white/10 text-white border border-white font-medium py-3 px-8 rounded-lg transition duration-300">
+              Create Account
+            </Link>
           </div>
         </div>
-      </div>
-
-      {/* Team section */}
-      <div className="bg-white py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="lg:text-center mb-12">
-            <h2 className="text-base text-blue-600 font-semibold tracking-wide uppercase">Our Team</h2>
-            <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
-              Built by developers, for developers
-            </p>
-            <p className="mt-4 max-w-2xl text-xl text-gray-500 lg:mx-auto">
-              Our team is passionate about creating tools that make web development easier and more efficient.
-            </p>
-          </div>
-        </div>
-      </div>
+      </section>
     </div>
   );
 }

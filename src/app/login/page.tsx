@@ -1,233 +1,160 @@
-"use client";
-import { useState, useEffect, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { signIn } from "next-auth/react";
-import Link from "next/link";
+'use client';
 
-// Loading component
-function LoginLoading() {
-  return (
-    <div className="flex justify-center items-center min-h-[60vh]">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-    </div>
-  );
-}
+import { useState } from 'react';
+import { signIn } from 'next-auth/react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 
-// Component that uses searchParams
-function LoginContent() {
-  const [form, setForm] = useState({ email: "", password: "" });
-  const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
   
-  // Check for error query parameter
-  useEffect(() => {
-    const errorType = searchParams?.get("error");
-    if (errorType) {
-      if (errorType === "OAuthAccountNotLinked") {
-        setError("Email already exists with a different sign-in method. Please use the original sign-in method.");
-      } else if (errorType === "AccessDenied") {
-        setError("Access denied. You might not have permission to sign in.");
-      } else if (errorType === "database") {
-        setError("Database connection error. Please try again later.");
-      } else {
-        setError(`Authentication error: ${errorType}`);
-      }
-    }
-    
-    // Check if we're being redirected back with a callbackUrl
-    const callbackUrl = searchParams?.get("callbackUrl");
-    if (callbackUrl && callbackUrl.includes("/dashboard")) {
-      // This means we were redirected back to login with a dashboard callbackUrl
-      // This is a sign of an authentication issue
-      console.log("Detected redirect loop with callbackUrl:", callbackUrl);
-      setError("Authentication failed. Please try again or use a different sign-in method.");
-    }
-  }, [searchParams]);
-  
-  async function handleSubmit(e: React.FormEvent) {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
+    setError('');
     setIsLoading(true);
-    
+
     try {
-      const res = await signIn("credentials", {
+      const result = await signIn('credentials', {
         redirect: false,
-        email: form.email,
-        password: form.password,
+        email,
+        password,
       });
-      
-      if (res?.error) {
-        setError("Invalid email or password");
-      } else {
-        router.push("/dashboard"); // Redirect on success
+
+      if (result?.error) {
+        setError('Invalid email or password');
+        setIsLoading(false);
+        return;
       }
-    } catch {
-      setError("An unexpected error occurred");
-    } finally {
-      setIsLoading(false);
-    }
-  }
-  
-  async function handleGoogleSignIn() {
-    try {
-      setIsLoading(true);
-      setError("");
-      
-      // Log the attempt for debugging
-      console.log("Initiating Google sign-in");
-      
-      // Force redirect to true and specify the absolute URL for the callback
-      const baseUrl = window.location.origin;
-      await signIn("google", { 
-        callbackUrl: `${baseUrl}/dashboard`,
-        redirect: true
-      });
+
+      router.push(callbackUrl);
     } catch (err) {
-      console.error("Google sign-in error:", err);
-      setError("Failed to initiate Google sign-in");
+      console.error('Login error:', err);
+      setError('An unexpected error occurred');
       setIsLoading(false);
     }
-  }
-  
+  };
+
+  const handleGoogleSignIn = () => {
+    signIn('google', { callbackUrl });
+  };
+
   return (
-    <div className="flex min-h-[80vh] flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          Sign in to your account
-        </h2>
-        <p className="mt-2 text-center text-sm text-gray-600">
-          Or{" "}
-          <Link href="/register" className="font-medium text-blue-600 hover:text-blue-500">
-            create a new account
-          </Link>
-        </p>
-      </div>
-
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow-lg sm:rounded-lg sm:px-10">
-          <form onSubmit={handleSubmit} className="space-y-6">
+    <div className="flex min-h-[80vh] items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="w-full max-w-md">
+        <div className="bg-[#1e1e1e] border border-[#333] rounded-lg shadow-xl p-8">
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-white">Welcome Back</h1>
+            <p className="text-gray-400 mt-2">Sign in to your account</p>
+          </div>
+          
+          {error && (
+            <div className="mb-4 p-3 bg-[rgba(244,67,54,0.1)] border border-[rgba(244,67,54,0.3)] text-red-500 rounded-md text-sm">
+              {error}
+            </div>
+          )}
+          
+          <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Email address
+              <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1">
+                Email Address
               </label>
-              <div className="mt-1">
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  value={form.email}
-                  onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                />
-              </div>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="sp-input w-full"
+                placeholder="your@email.com"
+              />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                Password
-              </label>
-              <div className="mt-1">
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  autoComplete="current-password"
-                  required
-                  value={form.password}
-                  onChange={(e) => setForm({ ...form, password: e.target.value })}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                />
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <input
-                  id="remember-me"
-                  name="remember-me"
-                  type="checkbox"
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                />
-                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
-                  Remember me
+              <div className="flex items-center justify-between mb-1">
+                <label htmlFor="password" className="block text-sm font-medium text-gray-300">
+                  Password
                 </label>
-              </div>
-
-              <div className="text-sm">
-                <Link href="/reset" className="font-medium text-blue-600 hover:text-blue-500">
-                  Forgot your password?
+                <Link href="/reset" className="text-sm text-blue-500 hover:text-blue-400">
+                  Forgot password?
                 </Link>
               </div>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                autoComplete="current-password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="sp-input w-full"
+                placeholder="••••••••"
+              />
             </div>
-
-            {error && (
-              <div className="rounded-md bg-red-50 p-4">
-                <div className="flex">
-                  <div className="flex-shrink-0">
-                    <svg className="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                  <div className="ml-3">
-                    <p className="text-sm text-red-700">{error}</p>
-                  </div>
-                </div>
-              </div>
-            )}
 
             <div>
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-[#1e1e1e] disabled:opacity-70 disabled:cursor-not-allowed"
               >
-                {isLoading ? "Signing in..." : "Sign in"}
+                {isLoading ? (
+                  <span className="flex items-center justify-center">
+                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Signing in...
+                  </span>
+                ) : (
+                  'Sign In'
+                )}
               </button>
             </div>
           </form>
-          
+
           <div className="mt-6">
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300" />
+                <div className="w-full border-t border-[#333]"></div>
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">Or continue with</span>
+                <span className="px-2 bg-[#1e1e1e] text-gray-400">Or continue with</span>
               </div>
             </div>
 
             <div className="mt-6">
               <button
-                type="button"
                 onClick={handleGoogleSignIn}
-                disabled={isLoading}
-                className="w-full flex justify-center items-center gap-3 py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                className="w-full flex items-center justify-center py-2.5 px-4 border border-[#333] rounded-md shadow-sm bg-[#252525] text-white hover:bg-[#333] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 focus:ring-offset-[#1e1e1e]"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="24px" height="24px">
-                  <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z" />
-                  <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z" />
-                  <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z" />
-                  <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z" />
+                <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M21.8055 10.0415H21V10H12V14H17.6515C16.827 16.3285 14.6115 18 12 18C8.6865 18 6 15.3135 6 12C6 8.6865 8.6865 6 12 6C13.5295 6 14.921 6.577 15.9805 7.5195L18.809 4.691C17.023 3.0265 14.634 2 12 2C6.4775 2 2 6.4775 2 12C2 17.5225 6.4775 22 12 22C17.5225 22 22 17.5225 22 12C22 11.3295 21.931 10.675 21.8055 10.0415Z" fill="#FFC107"/>
+                  <path d="M3.15295 7.3455L6.43845 9.755C7.32745 7.554 9.48045 6 12 6C13.5295 6 14.921 6.577 15.9805 7.5195L18.809 4.691C17.023 3.0265 14.634 2 12 2C8.15895 2 4.82795 4.1685 3.15295 7.3455Z" fill="#FF3D00"/>
+                  <path d="M12 22C14.583 22 16.93 21.0115 18.7045 19.404L15.6095 16.785C14.5718 17.5742 13.3038 18.001 12 18C9.39905 18 7.19005 16.3415 6.35855 14.027L3.09705 16.5395C4.75205 19.778 8.11405 22 12 22Z" fill="#4CAF50"/>
+                  <path d="M21.8055 10.0415H21V10H12V14H17.6515C17.2571 15.1082 16.5467 16.0766 15.608 16.7855L15.6095 16.7845L18.7045 19.4035C18.4855 19.6025 22 17 22 12C22 11.3295 21.931 10.675 21.8055 10.0415Z" fill="#1976D2"/>
                 </svg>
-                {isLoading ? "Signing in..." : "Sign in with Google"}
+                Sign in with Google
               </button>
             </div>
+          </div>
+          
+          <div className="mt-8 text-center text-sm text-gray-400">
+            Don't have an account?{' '}
+            <Link href="/register" className="text-blue-500 hover:text-blue-400 font-medium">
+              Create an account
+            </Link>
           </div>
         </div>
       </div>
     </div>
-  );
-}
-
-// Main component with Suspense boundary
-export default function LoginPage() {
-  return (
-    <Suspense fallback={<LoginLoading />}>
-      <LoginContent />
-    </Suspense>
   );
 }

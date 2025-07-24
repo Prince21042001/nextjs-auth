@@ -54,30 +54,30 @@ export default function ConfirmModal({
   }, [onCancel, isLoading]);
   
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/50 backdrop-blur-sm">
+    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/70 backdrop-blur-sm">
       <div 
         ref={modalRef}
-        className="bg-white p-6 rounded-xl shadow-lg max-w-md w-full animate-fade-in mx-4"
+        className="bg-[#1e1e1e] border border-[#333] p-6 rounded-xl shadow-xl max-w-md w-full animate-fade-in mx-4"
         role="dialog"
         aria-modal="true"
         aria-labelledby="modal-title"
       >
         <div className="mb-5">
-          <h2 id="modal-title" className="text-xl font-semibold text-gray-800 mb-2">{title}</h2>
-          <p className="text-sm text-gray-600 break-words whitespace-normal">{message}</p>
+          <h2 id="modal-title" className="text-xl font-semibold text-white mb-2">{title}</h2>
+          <p className="text-sm text-gray-300 break-words whitespace-normal">{message}</p>
         </div>
         
         <div className="flex justify-end gap-3">
           <button 
             onClick={onCancel} 
-            className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-all font-medium text-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
+            className="px-4 py-2 bg-[#252525] hover:bg-[#333] text-gray-300 rounded-lg transition-all font-medium text-sm focus:outline-none focus:ring-2 focus:ring-gray-600 focus:ring-offset-1 focus:ring-offset-[#1e1e1e]"
             disabled={isLoading}
           >
             Cancel
           </button>
           <button 
             onClick={onConfirm} 
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all font-medium text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center justify-center min-w-[80px] shadow-sm"
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all font-medium text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 focus:ring-offset-[#1e1e1e] flex items-center justify-center min-w-[80px] shadow-sm"
             disabled={isLoading}
           >
             {isLoading ? (
