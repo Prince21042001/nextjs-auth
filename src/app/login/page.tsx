@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
-import { signIn } from 'next-auth/react';
+import { useState, useEffect } from 'react';
+import { signIn, useSession } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
 export default function LoginPage() {
   const router = useRouter();
+  const { data: session, status } = useSession();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
   
@@ -14,6 +15,13 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (status === 'authenticated' && session) {
+      router.push(callbackUrl);
+    }
+  }, [status, session, router, callbackUrl]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,6 +33,7 @@ export default function LoginPage() {
         redirect: false,
         email,
         password,
+        callbackUrl,
       });
 
       if (result?.error) {
@@ -33,7 +42,10 @@ export default function LoginPage() {
         return;
       }
 
-      router.push(callbackUrl);
+      if (result?.ok) {
+        // Force a hard navigation to the dashboard
+        window.location.href = callbackUrl;
+      }
     } catch (err) {
       console.error('Login error:', err);
       setError('An unexpected error occurred');

@@ -30,7 +30,7 @@ export default function NavBar() {
   }, [profileMenuOpen]);
 
   return (
-    <header className="bg-[#1e1e1e] shadow-md sticky top-0 z-30 backdrop-blur-sm bg-opacity-95 text-white border-b border-[#333] h-16">
+    <header className="bg-[#1e1e1e] shadow-md fixed top-0 left-0 right-0 z-50 backdrop-blur-sm bg-opacity-95 text-white border-b border-[#333] h-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <nav className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -164,7 +164,7 @@ export default function NavBar() {
         
         {/* Mobile menu - only render on client to prevent hydration mismatch */}
         {mounted && mobileMenuOpen && session && (
-          <div className="md:hidden absolute top-16 right-0 left-0 bg-[#1e1e1e] border-b border-[#333] shadow-lg">
+          <div className="md:hidden fixed top-16 right-0 left-0 bg-[#1e1e1e] border-b border-[#333] shadow-lg z-40">
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
               <Link 
                 href="/dashboard" 

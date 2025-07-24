@@ -1,15 +1,15 @@
-import { ReactNode } from 'react';
+declare module './CryptoChart' {
+  import { ReactNode } from 'react';
 
-interface CryptoChartProps {
-  symbol: string;
-  interval?: string;
-  count?: number;
-  title?: string;
-  height?: number;
-  className?: string;
-  showPrediction?: boolean;
-}
+  export interface CryptoChartProps {
+    symbol: string;
+    interval?: string;
+    count?: number;
+    title?: string;
+    height?: number;
+    className?: string;
+    showPrediction?: boolean;
+  }
 
-declare function CryptoChart(props: CryptoChartProps): ReactNode;
-
-export default CryptoChart; 
+  export default function CryptoChart(props: CryptoChartProps): ReactNode;
+} 

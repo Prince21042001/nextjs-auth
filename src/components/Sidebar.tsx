@@ -94,7 +94,7 @@ export default function Sidebar() {
 
   return (
     <aside 
-      className="fixed left-0 top-16 h-[calc(100vh-4rem)] bg-[#1e1e1e] border-r border-[#333] transition-all duration-300 z-20"
+      className="fixed left-0 top-16 h-[calc(100vh-4rem)] bg-[#1e1e1e] border-r border-[#333] transition-all duration-300 z-40"
       style={{ width: collapsed ? '4rem' : '16rem' }}
     >
       <div className="flex flex-col h-full">

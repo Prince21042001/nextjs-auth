@@ -18,7 +18,7 @@ export function MainContent({ children }: MainContentProps) {
   // Prevent hydration mismatch
   if (!mounted) {
     return (
-      <main className="flex-grow pt-4 w-full">
+      <main className="flex-grow pt-4 w-full mt-16">
         <div className="px-4 md:px-8 max-w-full">
           {children}
         </div>
@@ -28,7 +28,7 @@ export function MainContent({ children }: MainContentProps) {
   
   return (
     <main 
-      className="flex-grow pt-4 w-full transition-all duration-300"
+      className="flex-grow pt-4 w-full transition-all duration-300 mt-16"
       style={{ paddingLeft: collapsed ? '4rem' : '16rem' }}
     >
       <div className="px-4 md:px-8 max-w-full">

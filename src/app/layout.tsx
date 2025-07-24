@@ -25,7 +25,7 @@ export default function RootLayout({
       <body className={`${inter.className} h-full overflow-x-hidden`}>
         <Providers>
           <SidebarProvider>
-            <div className="flex flex-col min-h-screen bg-gradient-to-br from-[#121212] to-[#1a1a1a] overflow-hidden">
+            <div className="flex flex-col min-h-screen bg-gradient-to-br from-[#121212] to-[#1a1a1a]">
               <NavBar />
               <div className="flex flex-1 relative">
                 <Sidebar />

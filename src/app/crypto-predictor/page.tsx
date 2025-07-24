@@ -2,10 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
-import Image from 'next/image';
 import CryptoDetail from '@/components/CryptoDetail';
 import CryptoChart from '@/components/CryptoChart';
-import { searchCryptos } from '@/lib/coingecko';
+import { searchCryptos, fetchLatestQuotes } from '@/lib/coingecko';
 import CryptoIcon from '@/components/CryptoIcon';
 
 export default function CryptoPredictor() {
@@ -19,6 +18,34 @@ export default function CryptoPredictor() {
   const [predictionLoading, setPredictionLoading] = useState(false);
   const [prediction, setPrediction] = useState<any>(null);
   const [showChartPrediction, setShowChartPrediction] = useState(false);
+  const [marketStats, setMarketStats] = useState({
+    btcPrice: 0,
+    ethPrice: 0,
+    btcChange: 0,
+    ethChange: 0,
+    loading: true
+  });
+
+  // Fetch market stats for the header
+  useEffect(() => {
+    const fetchMarketStats = async () => {
+      try {
+        const data = await fetchLatestQuotes(['BTC', 'ETH']);
+        setMarketStats({
+          btcPrice: data.BTC?.quote?.USD?.price || 0,
+          ethPrice: data.ETH?.quote?.USD?.price || 0,
+          btcChange: data.BTC?.quote?.USD?.percent_change_24h || 0,
+          ethChange: data.ETH?.quote?.USD?.percent_change_24h || 0,
+          loading: false
+        });
+      } catch (error) {
+        console.error('Error fetching market stats:', error);
+        setMarketStats(prev => ({ ...prev, loading: false }));
+      }
+    };
+
+    fetchMarketStats();
+  }, []);
 
   // Handle search input change
   const handleSearchChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -91,18 +118,56 @@ export default function CryptoPredictor() {
     }
   };
 
+  // Format price with appropriate decimal places
+  const formatPrice = (price: number): string => {
+    if (price >= 1000) return price.toLocaleString(undefined, { maximumFractionDigits: 2 });
+    if (price >= 1) return price.toLocaleString(undefined, { maximumFractionDigits: 4 });
+    return price.toLocaleString(undefined, { maximumFractionDigits: 6 });
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex flex-col md:flex-row items-center justify-between mb-8">
         <h1 className="text-3xl font-bold">Crypto Price Predictor</h1>
-        <div className="relative h-16 w-48 mt-4 md:mt-0">
-          <Image 
-            src="/images/crypto-assets-new-technologies-can-help-combat-amlcft.webp"
-            alt="Crypto Technologies"
-            fill
-            style={{ objectFit: 'cover' }}
-            className="rounded-lg"
-          />
+        
+        {/* Market stats card replacing the image */}
+        <div className="bg-[#252525] rounded-lg border border-[#333] p-3 mt-4 md:mt-0 w-full md:w-auto">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center">
+              <CryptoIcon symbol="BTC" size={20} className="mr-2" />
+              <div>
+                <div className="text-xs text-gray-400">Bitcoin</div>
+                {marketStats.loading ? (
+                  <div className="h-4 bg-[#333] rounded w-16 animate-pulse"></div>
+                ) : (
+                  <div className="text-sm font-medium flex items-center">
+                    ${formatPrice(marketStats.btcPrice)}
+                    <span className={`ml-1 text-xs ${marketStats.btcChange >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                      {marketStats.btcChange >= 0 ? '▲' : '▼'} 
+                      {Math.abs(marketStats.btcChange).toFixed(1)}%
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className="flex items-center">
+              <CryptoIcon symbol="ETH" size={20} className="mr-2" />
+              <div>
+                <div className="text-xs text-gray-400">Ethereum</div>
+                {marketStats.loading ? (
+                  <div className="h-4 bg-[#333] rounded w-16 animate-pulse"></div>
+                ) : (
+                  <div className="text-sm font-medium flex items-center">
+                    ${formatPrice(marketStats.ethPrice)}
+                    <span className={`ml-1 text-xs ${marketStats.ethChange >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                      {marketStats.ethChange >= 0 ? '▲' : '▼'} 
+                      {Math.abs(marketStats.ethChange).toFixed(1)}%
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       

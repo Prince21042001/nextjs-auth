@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { fetchLatestQuotes, formatPrice, formatPercentChange, formatLargeNumber, getPriceChangeColorClass, CryptoData } from '@/lib/coingecko';
+// @ts-ignore - Import CryptoChart component
 import CryptoChart from './CryptoChart';
 import CryptoIcon from './CryptoIcon';
 
